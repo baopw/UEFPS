@@ -1,0 +1,46 @@
+# Unreal Engine Core Ignored Folders
+# ---------------------------------------------------
+# These folders are strictly temporary and can be hundreds of gigabytes.
+# Unreal will automatically rebuild them when you launch the project.
+Binaries/
+DerivedDataCache/
+Intermediate/
+Saved/
+Build/
+
+# IDE and Code Editor Project Files
+# ---------------------------------------------------
+# You can generate these at any time by right-clicking 
+# your .uproject file and selecting "Generate Visual Studio project files".
+*.sln
+*.suo
+*.opensdf
+*.sdf
+*.opendb
+*.VC.db
+*.xcworkspace/
+*.xcodeproj/
+Makefile
+CMakeLists.txt
+
+# Editor / IDE Hidden Folders
+# ---------------------------------------------------
+.vs/
+.vscode/
+.idea/
+
+# OS Generated Files (Windows / macOS)
+# ---------------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Crash Dumps and Logs
+# ---------------------------------------------------
+*.log
+*.dmp
