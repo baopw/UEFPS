@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #include "FPSUserSetting.h"
 
 #include "GameFramework/InputSettings.h"
@@ -65,24 +63,7 @@ void UFPSUserSetting::SetMouseSensitivity(float NewSensitivity)
 
 void UFPSUserSetting::ApplyMouseSensitivity()
 {
-	UInputSettings* InputSettings = GetMutableDefault<UInputSettings>();
-	if (!InputSettings)
-	{
-		return;
-	}
-
-	auto ApplyAxisSensitivity = [InputSettings, this](const FName& AxisName)
-	{
-		/*FInputAxisProperties AxisProperties;
-		if (InputSettings->GetAxisProperties(AxisName, AxisProperties))
-		{
-			AxisProperties.Sensitivity = MouseSensitivity;
-			InputSettings->SetAxisProperties(AxisName, AxisProperties);
-		}*/
-	};
-
-	ApplyAxisSensitivity(FName(TEXT("MouseX")));
-	ApplyAxisSensitivity(FName(TEXT("MouseY")));
+	
 }
 
 void UFPSUserSetting::LoadOnStartup()
