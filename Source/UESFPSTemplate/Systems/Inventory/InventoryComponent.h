@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "Systems/Inventory/InventoryTypes.h"
+#include "InventoryTypes.h"
 #include "InventoryComponent.generated.h"
 
 class UConsumableItemDefinition;

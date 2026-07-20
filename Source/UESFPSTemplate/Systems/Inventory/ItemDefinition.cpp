@@ -1,3 +1,3 @@
-#include "Systems/Inventory/ItemDefinition.h"
+#include "ItemDefinition.h"
 
 const FPrimaryAssetType UItemDefinition::PrimaryAssetTypeName(TEXT("Item"));

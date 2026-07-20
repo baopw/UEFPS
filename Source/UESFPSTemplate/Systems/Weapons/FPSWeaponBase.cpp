@@ -1,8 +1,8 @@
-#include "Systems/Weapons/FPSWeaponBase.h"
+#include "FPSWeaponBase.h"
 
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/Character.h"
-#include "Systems/Inventory/ItemDefinition.h"
+#include "../Inventory/ItemDefinition.h"
 
 AFPSWeaponBase::AFPSWeaponBase()
 {

@@ -1,4 +1,4 @@
-#include "Systems/VitalsReflection.h"
+#include "VitalsReflection.h"
 
 #include "GameFramework/Actor.h"
 #include "UObject/UnrealType.h"

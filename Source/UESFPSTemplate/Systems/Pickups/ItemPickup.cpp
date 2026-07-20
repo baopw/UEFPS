@@ -1,11 +1,11 @@
-#include "Systems/Pickups/ItemPickup.h"
+#include "ItemPickup.h"
 
 #include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/Pawn.h"
-#include "Systems/Inventory/InventoryComponent.h"
-#include "Systems/Inventory/ItemDefinition.h"
-#include "Systems/Weapons/WeaponLoadoutComponent.h"
+#include "../Inventory/InventoryComponent.h"
+#include "../Inventory/ItemDefinition.h"
+#include "../Weapons/WeaponLoadoutComponent.h"
 
 AItemPickup::AItemPickup()
 {

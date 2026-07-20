@@ -1,8 +1,7 @@
-#include "Systems/Inventory/InventoryComponent.h"
-
-#include "Systems/Inventory/ItemDefinition.h"
-#include "Systems/Save/PlayerProgressSaveGame.h"
-#include "Systems/VitalsReflection.h"
+#include "InventoryComponent.h"
+#include "ItemDefinition.h"
+#include "../Save/PlayerProgressSaveGame.h"
+#include "../VitalsReflection.h"
 #include "TimerManager.h"
 
 UInventoryComponent::UInventoryComponent()

@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "Systems/Inventory/InventoryTypes.h"
+#include "../Inventory/InventoryTypes.h"
 #include "WeaponLoadoutComponent.generated.h"
 
 class AFPSWeaponBase;

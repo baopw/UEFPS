@@ -1,4 +1,4 @@
-#include "Systems/Weapons/WeaponLoadoutComponent.h"
+#include "WeaponLoadoutComponent.h"
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
@@ -8,9 +8,9 @@
 #include "GameFramework/PlayerController.h"
 #include "InputAction.h"
 #include "InputMappingContext.h"
-#include "Systems/Inventory/ItemDefinition.h"
-#include "Systems/Save/PlayerProgressSaveGame.h"
-#include "Systems/Weapons/FPSWeaponBase.h"
+#include "../Inventory/ItemDefinition.h"
+#include "../Save/PlayerProgressSaveGame.h"
+#include "FPSWeaponBase.h"
 #include "TimerManager.h"
 
 UWeaponLoadoutComponent::UWeaponLoadoutComponent()
@@ -43,7 +43,7 @@ void UWeaponLoadoutComponent::BeginPlay()
 			// Startup-time sync resolve is fine; gameplay-time loads stay async.
 			if (const UWeaponItemDefinition* Weapon = Pair.Value.LoadSynchronous())
 			{
-				AssignWeapon(Pair.Key, Weapon);
+				AssignWeapon(Pair.Key, const_cast<UWeaponItemDefinition*>(Weapon));
 			}
 		}
 	}

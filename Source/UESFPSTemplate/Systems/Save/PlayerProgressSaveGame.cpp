@@ -1,12 +1,12 @@
-#include "Systems/Save/PlayerProgressSaveGame.h"
+#include "PlayerProgressSaveGame.h"
 
 #include "Engine/AssetManager.h"
 #include "GameFramework/Actor.h"
 #include "Kismet/GameplayStatics.h"
-#include "Systems/Inventory/InventoryComponent.h"
-#include "Systems/Inventory/ItemDefinition.h"
-#include "Systems/VitalsReflection.h"
-#include "Systems/Weapons/WeaponLoadoutComponent.h"
+#include "../Inventory/InventoryComponent.h"
+#include "../Inventory/ItemDefinition.h"
+#include "../VitalsReflection.h"
+#include "../Weapons/WeaponLoadoutComponent.h"
 
 const FString UPlayerProgressSaveGame::SaveSlotName(TEXT("PlayerProgress"));
 

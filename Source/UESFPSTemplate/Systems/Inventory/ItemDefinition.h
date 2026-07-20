@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
-#include "Systems/Inventory/InventoryTypes.h"
+#include "InventoryTypes.h"
 #include "ItemDefinition.generated.h"
 
 class AFPSWeaponBase;

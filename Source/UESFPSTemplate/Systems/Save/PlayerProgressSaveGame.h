@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/SaveGame.h"
-#include "Systems/Inventory/InventoryTypes.h"
+#include "../Inventory/InventoryTypes.h"
 #include "PlayerProgressSaveGame.generated.h"
 
 class AActor;
