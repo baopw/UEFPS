@@ -1,6 +1,5 @@
 #include "ItemPickup.h"
 
-#include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/Pawn.h"
 #include "../Inventory/InventoryComponent.h"
@@ -11,27 +10,60 @@ AItemPickup::AItemPickup()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
-	CollectionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("CollectionSphere"));
-	CollectionSphere->SetSphereRadius(80.f);
-	CollectionSphere->SetCollisionProfileName(TEXT("OverlapOnlyPawn"));
-	SetRootComponent(CollectionSphere);
-
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
-	Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	Mesh->SetupAttachment(CollectionSphere);
+	SetRootComponent(Mesh);
 
-	CollectionSphere->OnComponentBeginOverlap.AddDynamic(this, &AItemPickup::OnSphereOverlap);
+	// Query-only so the pickup never blocks pawn movement, but is still hit by the
+	// interaction line trace (Visibility by default). Designers can enable physics
+	// on top of this for dropped loot.
+	Mesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	Mesh->SetCollisionResponseToAllChannels(ECR_Ignore);
+	Mesh->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
 }
 
-void AItemPickup::OnSphereOverlap(UPrimitiveComponent*, AActor* OtherActor, UPrimitiveComponent*, int32, bool, const FHitResult&)
+FText AItemPickup::GetInteractionText_Implementation() const
 {
-	APawn* Pawn = Cast<APawn>(OtherActor);
-	if (!Pawn || !Pawn->IsPlayerControlled() || !Item)
+	if (!Item)
+	{
+		return FText::GetEmpty();
+	}
+	if (Quantity > 1)
+	{
+		return FText::Format(NSLOCTEXT("Pickup", "PickupNameQty", "{0} x{1}"),
+			Item->DisplayName, FText::AsNumber(Quantity));
+	}
+	return Item->DisplayName;
+}
+
+FText AItemPickup::GetInteractionVerb_Implementation() const
+{
+	return NSLOCTEXT("Pickup", "PickupVerb", "Pick Up");
+}
+
+bool AItemPickup::CanInteract_Implementation(APawn* Interactor) const
+{
+	return Item != nullptr && Interactor != nullptr && Interactor->IsPlayerControlled() &&
+		Interactor->FindComponentByClass<UInventoryComponent>() != nullptr;
+}
+
+void AItemPickup::OnBeginFocus_Implementation()
+{
+	SetHighlighted(true);
+}
+
+void AItemPickup::OnEndFocus_Implementation()
+{
+	SetHighlighted(false);
+}
+
+void AItemPickup::Interact_Implementation(APawn* Interactor)
+{
+	if (!Interactor || !Interactor->IsPlayerControlled() || !Item)
 	{
 		return;
 	}
 
-	UInventoryComponent* Inventory = Pawn->FindComponentByClass<UInventoryComponent>();
+	UInventoryComponent* Inventory = Interactor->FindComponentByClass<UInventoryComponent>();
 	if (!Inventory)
 	{
 		return;
@@ -45,37 +77,38 @@ void AItemPickup::OnSphereOverlap(UPrimitiveComponent*, AActor* OtherActor, UPri
 
 	if (NotAdded > 0)
 	{
-		Quantity = NotAdded;
+		Quantity = NotAdded; // Partial pickup: leave the remainder behind.
 		return;
 	}
 
-	OnCollected(Pawn);
+	OnCollected(Interactor);
 	Destroy();
 }
 
-void AWeaponPickup::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AWeaponPickup::Interact_Implementation(APawn* Interactor)
 {
 	UWeaponItemDefinition* Weapon = Cast<UWeaponItemDefinition>(Item);
-	APawn* Pawn = Cast<APawn>(OtherActor);
-	const bool bHadItem = Weapon && Pawn && Pawn->IsPlayerControlled() &&
-		Pawn->FindComponentByClass<UInventoryComponent>() &&
-		Pawn->FindComponentByClass<UInventoryComponent>()->CountItem(Weapon) > 0;
+	UInventoryComponent* Inventory = Interactor ? Interactor->FindComponentByClass<UInventoryComponent>() : nullptr;
+	const bool bHadItem = Weapon && Inventory && Inventory->CountItem(Weapon) > 0;
 
-	Super::OnSphereOverlap(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
+	// Base handles moving the weapon into the Weapons tab (and may Destroy() this actor).
+	Super::Interact_Implementation(Interactor);
 
 	// Auto-equip into the first free matching slot the first time the weapon is obtained.
-	if (Weapon && Pawn && !bHadItem)
+	// Uses only cached locals - never touch this pickup's members after Super may have destroyed it.
+	if (!Weapon || !Interactor || bHadItem || !Inventory)
 	{
-		if (UWeaponLoadoutComponent* Loadout = Pawn->FindComponentByClass<UWeaponLoadoutComponent>())
+		return;
+	}
+
+	if (UWeaponLoadoutComponent* Loadout = Interactor->FindComponentByClass<UWeaponLoadoutComponent>())
+	{
+		if (Inventory->CountItem(Weapon) > 0)
 		{
-			if (Pawn->FindComponentByClass<UInventoryComponent>()->CountItem(Weapon) > 0)
+			const EWeaponSlot Slot = Loadout->FindSlotForWeapon(Weapon);
+			if (!Loadout->GetSlotWeapon(Slot))
 			{
-				const EWeaponSlot Slot = Loadout->FindSlotForWeapon(Weapon);
-				if (!Loadout->GetSlotWeapon(Slot))
-				{
-					Loadout->AssignWeapon(Slot, Weapon);
-				}
+				Loadout->AssignWeapon(Slot, Weapon);
 			}
 		}
 	}

@@ -2,19 +2,24 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "../Interaction/InteractableInterface.h"
 #include "ItemPickup.generated.h"
 
 class UItemDefinition;
-class USphereComponent;
 class UStaticMeshComponent;
 
 /**
- * World pickup that adds its item to the overlapping player's inventory.
- * Place in the level and set Item + Quantity. If only part of the quantity
- * fits, the remainder stays in the world.
+ * World pickup the player picks up by looking at it and pressing Interact (E),
+ * Cyberpunk-style. It implements IInteractable: the player's UInteractionComponent
+ * highlights it and shows its name while focused, and calls Interact to move the
+ * item into the inventory. If only part of the quantity fits, the remainder stays
+ * in the world.
+ *
+ * Set Item + Quantity. The mesh is the root and must be hit by the interaction
+ * trace channel (Visibility by default) - keep its collision query-enabled.
  */
 UCLASS(BlueprintType, Blueprintable)
-class UESFPSTEMPLATE_API AItemPickup : public AActor
+class UESFPSTEMPLATE_API AItemPickup : public AActor, public IInteractable
 {
 	GENERATED_BODY()
 
@@ -28,31 +33,37 @@ public:
 	int32 Quantity = 1;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Pickup")
-	TObjectPtr<USphereComponent> CollectionSphere;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Pickup")
 	TObjectPtr<UStaticMeshComponent> Mesh;
 
 	/** Blueprint hook for pickup feedback (sound, VFX) before the actor is destroyed. */
 	UFUNCTION(BlueprintImplementableEvent, Category = "Pickup")
 	void OnCollected(APawn* Collector);
 
-protected:
-	UFUNCTION()
-	virtual void OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	/**
+	 * Blueprint hook to toggle the highlight/outline while the player is looking at
+	 * this pickup. Drive a post-process outline or material param from here.
+	 */
+	UFUNCTION(BlueprintImplementableEvent, Category = "Pickup")
+	void SetHighlighted(bool bHighlighted);
+
+	// ---- IInteractable ----
+	virtual FText GetInteractionText_Implementation() const override;
+	virtual FText GetInteractionVerb_Implementation() const override;
+	virtual bool CanInteract_Implementation(APawn* Interactor) const override;
+	virtual void OnBeginFocus_Implementation() override;
+	virtual void OnEndFocus_Implementation() override;
+	virtual void Interact_Implementation(APawn* Interactor) override;
 };
 
 /**
  * Weapon pickup: adds the weapon to the Weapons tab and auto-equips it into
- * the first free loadout slot of the matching kind.
+ * the first free loadout slot of the matching kind the first time it is picked up.
  */
 UCLASS(BlueprintType, Blueprintable)
 class UESFPSTEMPLATE_API AWeaponPickup : public AItemPickup
 {
 	GENERATED_BODY()
 
-protected:
-	virtual void OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
+public:
+	virtual void Interact_Implementation(APawn* Interactor) override;
 };
