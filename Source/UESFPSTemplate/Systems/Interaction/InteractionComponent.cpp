@@ -185,5 +185,10 @@ void UInteractionComponent::TryInteract()
 
 	// The interaction may have destroyed the actor (item picked up) or changed its
 	// state; re-run the trace so the prompt refreshes on the same frame.
-	UpdateFocus();
+	if (!IsValid(Target))
+	{
+		FocusedActor = nullptr;
+		OnFocusedInteractableChanged.Broadcast(nullptr, FText::GetEmpty(), FText::GetEmpty());
+	}
+		UpdateFocus();
 }

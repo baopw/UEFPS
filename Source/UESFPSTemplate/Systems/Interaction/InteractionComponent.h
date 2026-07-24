@@ -18,8 +18,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnFocusedInteractableChanged, AA
 	const FText&, InteractionText, const FText&, InteractionVerb);
 
 /**
- * Cyberpunk-style look-at interaction. Add this to the player pawn. Each tick it
- * line-traces from the camera; when the aim rests on an actor implementing
+ * Each tick it line-traces from the camera; when the aim rests on an actor implementing
  * IInteractable it highlights it and shows a prompt, and pressing the Interact
  * key (E, via IA_Interact) runs the interaction. Looking away or walking out of
  * range clears the focus and hides the prompt automatically.
@@ -46,7 +45,7 @@ public:
 
 	/** Seconds between focus traces. 0 = every frame. Keep low (~0.05-0.1) for responsiveness. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Interaction", meta = (ClampMin = 0))
-	float TraceInterval = 0.05f;
+	float TraceInterval = 0.1f;
 
 	/** Interact input action. Resolved from IA_Interact; falls back to a runtime E mapping. */
 	UPROPERTY(EditAnywhere, Category = "Interaction|Input")
